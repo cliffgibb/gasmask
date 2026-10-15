@@ -64,7 +64,7 @@ static ApplicationController *sharedInstance = nil;
 		shouldQuit = YES;
 
 		BOOL isTesting = NSClassFromString(@"XCTestCase") != nil;
-		if (!isTesting) {
+		if (!isTesting && [ApplicationController isUpdaterConfiguredWithInfo:[[NSBundle mainBundle] infoDictionary]]) {
 			_updaterController = [[SPUStandardUpdaterController alloc]
 								  initWithStartingUpdater:YES
 								  updaterDelegate:nil
@@ -80,6 +80,21 @@ static ApplicationController *sharedInstance = nil;
 		return self;
 	}
     return sharedInstance;
+}
+
++ (BOOL)isUpdaterConfiguredWithInfo:(NSDictionary*)info
+{
+	// Sparkle 2 refuses to start (and shows an error alert) without a valid EdDSA key,
+	// and ATS blocks plain HTTP feeds.
+	NSString *key = info[@"SUPublicEDKey"];
+	if (![key isKindOfClass:[NSString class]] || [key length] == 0 || [key hasPrefix:@"REPLACE_"]) {
+		return NO;
+	}
+	NSString *feed = info[@"SUFeedURL"];
+	if (![feed isKindOfClass:[NSString class]]) {
+		return NO;
+	}
+	return [[[NSURL URLWithString:feed] scheme] isEqualToString:@"https"];
 }
 
 - (SPUUpdater *)updater
@@ -171,8 +186,12 @@ static ApplicationController *sharedInstance = nil;
 {
 	(void)[GlobalShortcuts shared]; // Register global hotkeys
 
-	checkForUpdatesMenuItem.target = _updaterController;
-	checkForUpdatesMenuItem.action = @selector(checkForUpdates:);
+	if (_updaterController) {
+		checkForUpdatesMenuItem.target = _updaterController;
+		checkForUpdatesMenuItem.action = @selector(checkForUpdates:);
+	} else {
+		checkForUpdatesMenuItem.hidden = YES;
+	}
 
 	[NSApp setServicesProvider:self];
 
