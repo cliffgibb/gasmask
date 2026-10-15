@@ -10,6 +10,9 @@ final class SparkleObserver: ObservableObject {
 
     private let updater: SPUUpdater?
 
+    /// `false` when this build has no working Sparkle configuration, so update UI should be disabled.
+    var isUpdaterAvailable: Bool { updater != nil }
+
     private static let dateFormatter: DateFormatter = {
         let formatter = DateFormatter()
         formatter.dateStyle = .long

@@ -35,6 +35,9 @@
 
 + (ApplicationController*)defaultInstance;
 
+/** YES when the Info dictionary has a real Sparkle EdDSA key and an HTTPS feed URL. */
++ (BOOL)isUpdaterConfiguredWithInfo:(NSDictionary*)info;
+
 @property (nonatomic, readonly) SPUUpdater *updater;
 
 - (IBAction)openPreferencesWindow:(id)sender;

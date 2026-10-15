@@ -101,6 +101,7 @@ struct UpdateTab: View {
                 get: { sparkleObserver.automaticChecksEnabled },
                 set: { sparkleObserver.setAutomaticChecks($0) }
             ))
+            .disabled(!sparkleObserver.isUpdaterAvailable)
 
             Text(sparkleObserver.lastCheckDateFormatted)
                 .font(.caption)
@@ -109,6 +110,12 @@ struct UpdateTab: View {
                 sparkleObserver.checkForUpdates()
             }
             .disabled(!sparkleObserver.canCheckForUpdates)
+
+            if !sparkleObserver.isUpdaterAvailable {
+                Text("Automatic updates are not available in this build.")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+            }
         }
         .padding(20)
     }

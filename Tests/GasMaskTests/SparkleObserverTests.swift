@@ -14,6 +14,7 @@ final class SparkleObserverTests: XCTestCase {
         XCTAssertNil(observer.lastCheckDate)
         XCTAssertFalse(observer.automaticChecksEnabled)
         XCTAssertFalse(observer.canCheckForUpdates)
+        XCTAssertFalse(observer.isUpdaterAvailable)
     }
 
     func testLastCheckDateFormatted_date_returnsFormattedString() {

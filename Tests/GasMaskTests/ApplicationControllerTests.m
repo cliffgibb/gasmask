@@ -87,6 +87,41 @@ static void runLoopDrain(NSTimeInterval seconds)
 
 #pragma mark - Window creation / open
 
+#pragma mark - Updater configuration
+
+- (void)testUpdaterConfigured_placeholderKey_returnsNO
+{
+    NSDictionary *info = @{@"SUPublicEDKey": @"REPLACE_WITH_EDDSA_PUBLIC_KEY",
+                           @"SUFeedURL": @"https://example.com/appcast.xml"};
+    XCTAssertFalse([ApplicationController isUpdaterConfiguredWithInfo:info]);
+}
+
+- (void)testUpdaterConfigured_missingKey_returnsNO
+{
+    NSDictionary *info = @{@"SUFeedURL": @"https://example.com/appcast.xml"};
+    XCTAssertFalse([ApplicationController isUpdaterConfiguredWithInfo:info]);
+}
+
+- (void)testUpdaterConfigured_httpFeed_returnsNO
+{
+    NSDictionary *info = @{@"SUPublicEDKey": @"pfIShU4dEXqPd5ObYNfDBiQWcXozk7estwzTnF9BamQ=",
+                           @"SUFeedURL": @"http://example.com/appcast.xml"};
+    XCTAssertFalse([ApplicationController isUpdaterConfiguredWithInfo:info]);
+}
+
+- (void)testUpdaterConfigured_validKeyAndHTTPSFeed_returnsYES
+{
+    NSDictionary *info = @{@"SUPublicEDKey": @"pfIShU4dEXqPd5ObYNfDBiQWcXozk7estwzTnF9BamQ=",
+                           @"SUFeedURL": @"https://example.com/appcast.xml"};
+    XCTAssertTrue([ApplicationController isUpdaterConfiguredWithInfo:info]);
+}
+
+- (void)testUpdaterConfigured_shippedInfoPlist_returnsNO
+{
+    // The committed Info.plist still has the placeholder key, so the updater must stay off.
+    XCTAssertFalse([ApplicationController isUpdaterConfiguredWithInfo:[[NSBundle mainBundle] infoDictionary]]);
+}
+
 - (void)testLoadEditorWindow_setsEditorWindowOpenedFlag
 {
     XCTAssertFalse([self.controller editorWindowOpened], @"precondition");
